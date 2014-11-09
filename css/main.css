@@ -1,0 +1,59 @@
+html, body{
+    position:relative;
+    padding: 0; margin: 0;
+    overflow: hidden;
+    width:100%;
+    height:100%;
+    font-family: 'Open Sans', sans-serif;
+}
+#earth_div{
+    top: 0; right: 0; bottom: 0; left: 0; 
+    position: absolute !important;
+    z-index:0;
+}
+#musicBox{
+    position:absolute;
+    z-index:2;
+    background:rgba(99, 116, 154, 0.75);
+    border:solid #63749A 2px;
+    padding:10px;
+    color:#EAF5EA;
+    margin:20px 40px;
+    padding:10px;
+}
+#audio{
+    margin:10px 0;
+}
+#albumArt{
+    float:left;
+}
+#songInfo{
+    float:left;
+    margin:10px;
+}
+#mainBox{
+    float:left;
+}
+#extender{
+    text-decoration:none;
+    float:left;
+    font-size:3em;
+    border-left:#EAF5EA solid 1px;
+    margin-top:.5em;
+    margin-left:.5em;
+    padding:0 .2em;
+    vertical-align: center;
+    cursor:pointer;
+}
+#hiddenOptions{
+    float:left;
+    width:0;
+    color:rgba(234, 245, 234, 0);
+    margin: 10px;
+    
+    transition:all  1s ease;
+}
+#hiddenOptions.shown{
+    width:15em;
+    color:rgba(234, 245, 234, 1);
+}

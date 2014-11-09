@@ -1,39 +1,9 @@
 <!DOCTYPE HTML>
 <html>
   <head>
-    <style>
-    
-        html, body{
-            padding: 0; margin: 0;
-            overflow: hidden;
-            vertical-align: bottom;
-            width:100%;
-            height:100%;
-        }
-        #earth_div{
-            top: 0; right: 0; bottom: 0; left: 0; 
-            position: absolute !important;
-            z-index:0;
-        }
-        #musicBox{
-            position:absolute;
-            z-index:2;
-            background:rgba(0,0,0,.25);
-            -webkit-border-radius: 20px;
-            -moz-border-radius: 20px;
-            border-radius: 20px;
-            border:solid #000 2px;
-            display:inline-block;
-            vertical-align:bottom;
-            padding:10px;
-        }
-        #albumArt{
-            float:left;
-        }
-        #songInfo{
-            float:left;
-        }
-    </style>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:600,300' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="css/main.css"/>
+    <link rel="stylesheet" type="text/css" href="css/selector.css"/>
     
     <script src="js/api.js"></script>
     <script src="js/config.js"></script>
@@ -45,8 +15,10 @@
         var mCount=0;
         var id, pid;
         var elemArt, elemSong, elemArtist;
+        var elemSort, elemOpts;
         
         var data;
+        var shown=false;
         
         function initialize() {
             earth = new WE.map('earth_div');
@@ -58,6 +30,8 @@
             elemArt=document.getElementById("albumArt");
             elemSong=document.getElementById("songName");
             elemArtist=document.getElementById("artistName");
+            elemSort=document.getElementById("sort");
+            elemOpts=document.getElementById("hiddenOptions");
         }
         function loop() 
         {
@@ -84,7 +58,7 @@
                 elemArt.setAttribute("src",sData.album.images[2].url);
             }
             elemSong.innerHTML=song;
-            elemArtist.innerHTML="by "+artist;
+            elemArtist.innerHTML=artist;
             for(var i=0;i<sData.album.images.length;i++){
                 var img=sData.album.images[i];
                 console.log(img.width);
@@ -113,8 +87,11 @@
                         "&min_longitude="+bounds[2]+
                         "&max_longitude="+bounds[3]+
                         "&min_latitude="+bounds[0]+
-                        "&max_latitude=" + bounds[1]+
-                        "&sort="+"song_hotttnesss-desc";
+                        "&max_latitude=" + bounds[1];
+                if(!(elemSort.value==="")){
+                    theURL+="&sort="+elemSort.value;
+                }
+                        
                 x.open("GET", theURL, false);
                 x.send(null);
                 //console.log(x.responseText);
@@ -148,17 +125,55 @@
                 }
             }
         }
+        function showE(el){
+            if(!shown){
+                elemOpts.setAttribute("class", "shown");
+                el.innerHTML='-';
+            }else{
+                elemOpts.setAttribute("class", "");
+                el.innerHTML='+';
+            }
+            shown=!shown;
+
+                
+        }
     </script>
     <title>SongSpace</title>
   </head>
   <body onload="initialize()">
     <div id="earth_div"></div>
     <div id="musicBox">
+    <span id="mainBox">
         <img id="albumArt"></img><div id="songInfo">
-        <b id="songName"></b> <br/><i id="artistName"></i></div><br/>
-        <audio id="audio"  controls>
+        <b id="songName"></b> <br/><span id="artistName"></span></div><br/>
+        <audio id="audio" controls>
         Your browser does not support the audio element, which is rather unfortunate? Um. This site won't really do much for ou, then.
         </audio>
+    </span> 
+    <span id="hiddenOptions">
+    Select song by
+    <section>
+            <select class="cs-select cs-skin-underline" id="sort">
+                    <option value="song_hotttnesss-desc">Song Popularity</option>
+                    <option value="artist_hotttnesss-desc">Artist Popularity</option>
+                    <option value="artist_familiarity-desc">Artist Familiarity</option>
+                    <option value="">Random</option>
+            </select>
+    </section>
+    </span>
+    <span id="extender" onclick="showE(this)">
+    +
+    </span>
     </div>
+    <script src="js/classie.js"></script>
+    <script src="js/selectFx.js"></script>
+    <script>
+            (function() {
+                    [].slice.call( document.querySelectorAll( 'select.cs-select' ) ).forEach( function(el) {        
+                            new SelectFx(el);
+                    } );
+            })();
+    </script>
+
   </body>
 </html>

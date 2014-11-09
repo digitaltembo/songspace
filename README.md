@@ -15,5 +15,4 @@ TODO:
 * Playlists (from song, from artist, from location?)
 * Audio Visualization
 * More information on artist
-* Alternative sorting (currently only by "hotttnesss")
 
