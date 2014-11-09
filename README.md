@@ -1,7 +1,8 @@
 SongSpace
 =========
 
-Fly about the globe and listen to it's music: [See project live](http://dijitalelefan.com/songspace/)
+Fly about the globe and listen to it's music.
+[See project live.](http://dijitalelefan.com/songspace/)
 
 
 Leveraging the power of the [EchoNest API](http://the.echonest.com/) 
