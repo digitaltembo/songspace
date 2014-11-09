@@ -10,8 +10,8 @@ and the [WebGL Earth JavaScript API](http://www.webglearth.org/) (which, in turn
 for displaying the globe, I made this project to explore the world and the music within it.
 
 TODO:
-    *Playlists (from song, from artist, from location?)
-    *Audio Visualization
-    *More information on artist
-    *Alternative sorting (currently only by "hotttnesss")
+    * Playlists (from song, from artist, from location?)
+    * Audio Visualization
+    * More information on artist
+    * Alternative sorting (currently only by "hotttnesss")
 
