@@ -16,10 +16,10 @@ html, body{
     z-index:2;
     background:rgba(99, 116, 154, 0.75);
     border:solid #63749A 2px;
-    padding:10px;
     color:#EAF5EA;
     margin:20px 40px;
-    padding:10px;
+    height:6em;
+    padding:1em;
 }
 #audio{
     margin:10px 0;
@@ -34,12 +34,17 @@ html, body{
 #mainBox{
     float:left;
 }
+#mainBox.notPlaying{
+    font-size:2em;
+    height:100%;
+    margin-top:.6em;
+}
 #extender{
     text-decoration:none;
     float:left;
     font-size:3em;
     border-left:#EAF5EA solid 1px;
-    margin-top:.5em;
+    margin-top:.2em;
     margin-left:.5em;
     padding:0 .2em;
     vertical-align: center;
@@ -57,3 +62,10 @@ html, body{
     width:15em;
     color:rgba(234, 245, 234, 1);
 }
+
+.icons{
+    cursor:pointer;
+    font-size:1.5em;
+}
+
+    
