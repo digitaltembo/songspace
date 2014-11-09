@@ -13,7 +13,7 @@
         #earth_div{
             top: 0; right: 0; bottom: 0; left: 0; 
             position: absolute !important;
-            z-index:-1;
+            z-index:0;
         }
         #musicBox{
             position:absolute;
@@ -75,17 +75,18 @@
             var theURL="https://api.spotify.com/v1/tracks/"+trackID;
             x.open("GET", theURL, false);
             x.send(null);
-            var sdata=JSON.parse(x.responseText);
-            var songSrc=data.preview_url;
+            console.log(x.responseText);
+            var sData=JSON.parse(x.responseText);
+            var songSrc=sData.preview_url;
             audioPlayer.setAttribute("src", songSrc);
             audioPlayer.play();
-            if(data.album.images.length==3){
-                elemArt.setAttribute("src",data.album.images[2].url);
+            if(sData.album.images.length==3){
+                elemArt.setAttribute("src",sData.album.images[2].url);
             }
             elemSong.innerHTML=song;
             elemArtist.innerHTML="by "+artist;
-            for(var i=0;i<data.album.images.length;i++){
-                var img=data.album.images[i];
+            for(var i=0;i<sData.album.images.length;i++){
+                var img=sData.album.images[i];
                 console.log(img.width);
             }
             
@@ -102,7 +103,7 @@
                 console.log("boo!");
                 var x = new XMLHttpRequest();
                 theURL = "http://developer.echonest.com/api/v4/song/search?"+
-                        "api_key"+config.EchoNestAPI+
+                        "api_key="+config.EchoNestAPI+
                         "&format=json"+
                         "&results=1"+
                         "&bucket=id:spotify"+
@@ -116,7 +117,7 @@
                         "&sort="+"song_hotttnesss-desc";
                 x.open("GET", theURL, false);
                 x.send(null);
-                console.log(x.responseText);
+                //console.log(x.responseText);
                 data = JSON.parse(x.responseText);
                 if (data != null) 
                 {
@@ -148,7 +149,7 @@
             }
         }
     </script>
-    <title>WebGL Earth API: Hello World</title>
+    <title>SongSpace</title>
   </head>
   <body onload="initialize()">
     <div id="earth_div"></div>
