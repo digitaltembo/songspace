@@ -3,7 +3,7 @@ SongSpace
 
 Fly about the globe and listen to its music, filtered by different types of popularity, style, and mood.
 
-[See project live.](http://dijitalelefan.com/songspace/)
+[See project live.](http://dijitalelefan.com/projects/song_space/)
 
 
 Leveraging the power of the [EchoNest API](http://the.echonest.com/) 
