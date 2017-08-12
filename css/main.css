@@ -4,6 +4,7 @@ html, body{
     overflow: hidden;
     width:100%;
     height:100%;
+    background:#E5E8EF;
     font-family: 'Open Sans', sans-serif;
 }
 #earth_div{
@@ -20,6 +21,7 @@ html, body{
     margin:20px 40px;
     height:6em;
     padding:1em;
+
 }
 #audio{
     margin:10px 0;
@@ -49,18 +51,42 @@ html, body{
     padding:0 .2em;
     vertical-align: center;
     cursor:pointer;
+    z-index:4;
 }
 #hiddenOptions{
     float:left;
     width:0;
     color:rgba(234, 245, 234, 0);
     margin: 10px;
-    
+    visibility:none;
     transition:all  1s ease;
 }
 #hiddenOptions.shown{
-    width:15em;
+    width:40em;
     color:rgba(234, 245, 234, 1);
+    visibility:visible;
+}
+#sortSelector{
+    width:15em;
+    float:left;
+    overflow:hidden;
+}
+.my-select{
+    width:20em;
+    background-color:transparent;
+    color:#fff;
+    border:0;
+    border-bottom:solid 2px #fff;
+    cursor:pointer;
+}
+.my-select:-moz-focusring {
+    color: transparent;
+    text-shadow: 0 0 0 #FFF;
+}
+.hiddenOpt{
+    display:inline-block;
+    float:left;
+    width:5em;
 }
 
 .icons{
@@ -68,4 +94,8 @@ html, body{
     font-size:1.5em;
 }
 
+input{
+    text-decoration:underline;
+    border-bottom:2px solid #fff;
+}
     

@@ -7,6 +7,8 @@
     
     <script src="js/api.js"></script>
     <script src="js/config.js"></script>
+    <script src="js/complete.ly.1.0.1.min.js"></script>
+    <script src="js/terms.js"></script>
     <script>
         var earth;
         var audioPlayer;
@@ -21,6 +23,27 @@
         var shown=false;
         var started=false;
         
+        var moodComplete, styleComplete;
+        var queue=[];
+        var nowPlaying=-1;
+        var previousMarker=-1;
+        function song(echonestID, spotifyID, title, artist, artistID, markerIndex){
+            this.echonestID=echonestID;
+            this.spotifyID=spotifyID.substr(spotifyID.lastIndexOf(':')+1);
+            this.url=0;
+            this.title=title;
+            this.artist=artist;
+            this.artistID=artistID;
+            this.markerIndex=markerIndex;
+        }
+        function alreadyInQueue(echonestID){
+            for(s in queue){
+                if(s.echonestID==echonestID){
+                    return true;
+                }
+            }
+            return false;
+        }
         function initialize() {
             earth = new WE.map('earth_div');
             WE.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -29,6 +52,31 @@
             setInterval(loop, 10000);
             elemSort=document.getElementById("sort");
             elemOpts=document.getElementById("hiddenOptions");
+            styleComplete=completely(document.getElementById("styleSelector"),{
+                fontFamily: 'Open Sans',
+                fontSize:'1em',
+                color:'#EAF5EA',
+                backgroundColor:'transparent'
+                });
+            styleComplete.options=styleTerms;
+            styleComplete.setText("none");
+            styleComplete.repaint();
+            
+            moodComplete=completely(document.getElementById("moodSelector"),{
+                fontFamily: 'Open Sans',
+                fontSize:'1em',
+                color:'#EAF5EA',
+                backgroundColor:'transparent'
+                });
+            moodComplete.options=moodTerms;
+            moodComplete.setText("none");
+            styleComplete.wrapper.style.display='none';
+            moodComplete.repaint();
+            moodComplete.wrapper.style.display='none';
+            moodComplete.repaint();
+                
+            document.getElementById("sortSelector").style.display='none';
+
         }
         function loop() 
         {
@@ -40,7 +88,13 @@
                 getMusic(latLong);
             }
         }
-        function playSpotifyTrack(trackID, artist, song) 
+        function playNextSong(){
+            if(nowPlaying<queue.length-1){
+                nowPlaying++
+                playSpotifyTrack(queue[nowPlaying]);
+                }
+        }
+        function playSpotifyTrack(s) 
         {
             if(!started){
                 var box=document.getElementById("mainBox");
@@ -51,7 +105,7 @@
                 Your browser does not support the audio element, which is rather unfortunate? Um. This site won\'t really do much for you, then. \
                 </audio> \
                 <span id="playButton" onclick="playpause()" title="pause" class="icons">&#9616;&#9616;</span> &nbsp;&nbsp; \
-                <span id="nextSong" onClick="nextSong()" text="next song" class="icons"> &#9197;</span>';
+                <span id="nextSong" onClick="playNextSong()" text="next song" class="icons"> &#9197;</span>';
                 box.setAttribute("class","");
                 started=true;
                 audioPlayer=document.getElementById("audio");
@@ -60,27 +114,31 @@
                 elemArtist=document.getElementById("artistName");
                 elemPlayButton=document.getElementById("playButton");
             }
-            
-            elemPlayButton.innerHTML="&#9616;&#9616;"
-            elemPlayButton.setAttribute("title","pause");
             var x = new XMLHttpRequest();
-            var theURL="https://api.spotify.com/v1/tracks/"+trackID;
+            var theURL="https://api.spotify.com/v1/tracks/"+s.spotifyID;
             x.open("GET", theURL, false);
             x.send(null);
-            console.log(x.responseText);
             var sData=JSON.parse(x.responseText);
             var songSrc=sData.preview_url;
-            audioPlayer.setAttribute("src", songSrc);
-            audioPlayer.play();
-            if(sData.album.images.length==3){
-                elemArt.setAttribute("src",sData.album.images[2].url);
-            }
-            elemSong.innerHTML=song;
-            elemArtist.innerHTML=artist;
-            for(var i=0;i<sData.album.images.length;i++){
-                var img=sData.album.images[i];
-                console.log(img.width);
-            }
+            if(songSrc!=null){
+            
+                elemPlayButton.innerHTML="&#9616;&#9616;"
+                elemPlayButton.setAttribute("title","pause");
+                audioPlayer.setAttribute("src", songSrc);
+                console.log(audioPlayer.getAttribute("src"));
+                audioPlayer.play();
+                if(sData.album.images.length==3){
+                    elemArt.setAttribute("src",sData.album.images[2].url);
+                }
+                elemSong.innerHTML=s.title;
+                elemArtist.innerHTML=s.artist;
+                markers[s.markerIndex].openPopup();
+                if(previousMarker!=-1)  
+                    markers[previousMarker].closePopup();
+                previousMarker=s.markerIndex;
+           }else{
+                playNextSong();
+           }
             
         }
         function getMusic(latLong) 
@@ -88,11 +146,9 @@
             bounds = earth.getBounds();
             if (bounds == null) 
             {
-                console.log("hey!");
             } 
             else 
             {
-                console.log("boo!");
                 var x = new XMLHttpRequest();
                 theURL = "http://developer.echonest.com/api/v4/song/search?"+
                         "api_key="+config.EchoNestAPI+
@@ -101,7 +157,6 @@
                         "&bucket=id:spotify"+
                         "&bucket=tracks"+
                         "&bucket=artist_location"+
-                        "&bucket=song_type"+
                         "&min_longitude="+bounds[2]+
                         "&max_longitude="+bounds[3]+
                         "&min_latitude="+bounds[0]+
@@ -109,18 +164,54 @@
                 if(!(elemSort.value==="")){
                     theURL+="&sort="+elemSort.value;
                 }
+                var mood=moodComplete.getText();
+                var style=styleComplete.getText();
+                if(moodTerms.indexOf(mood)>0){
+                    theURL+="&mood="+mood;
+                }
+                if(styleTerms.indexOf(style)>0){
+                    theURL+="&style="+style;
+                }
                         
                 x.open("GET", theURL, false);
                 x.send(null);
-                //console.log(x.responseText);
                 data = JSON.parse(x.responseText);
-                if (data != null) 
+                if (data != null);
                 {
                     if (data.response.status.code == "0") 
                     {
-                        songPlaying=-1;
-                        nextSong();
-                        
+                        var openMarker=false;
+                        for(var i=0;i<data.response.songs.length;i++){
+                            var songData=data.response.songs[i];
+                            if(!alreadyInQueue(songData.id)){
+                                var playable=(songData.tracks.length>0);
+                                markers.push(new WE.marker([songData.artist_location.latitude,
+                                                        songData.artist_location.longitude]));
+                                markers[markers.length-1].addTo(earth);
+                                markers[markers.length-1].bindPopup("<b>"+songData.title+"</b></br><i>by "+
+                                                        "<a href='#' class='info' onclick='getInfo("+
+                                                        songData.artist_id+";return False;' title='More info'>"
+                                                        +songData.artist_name +"</a></i>"+
+                                                        ((!playable)?
+                                                        "<br/>Unfortunately, this song is not available on Spotify"
+                                                         :"<br/><a href='#' class='playlink' onclick='"+
+                                                          "playSpotifyTrack(queue["+queue.length+"]);nowPlaying="+
+                                                          queue.length+";'>play</a>"));
+                                
+                                if(playable){
+                                    queue.push(new song(songData.id, 
+                                                        songData.tracks[0].foreign_id,
+                                                        songData.title, 
+                                                        songData.artist_name, 
+                                                        songData.artist_id,
+                                                        markers.length-1));
+                                    if(!openMarker){
+                                        playNextSong();
+                                        openMarker=true;
+                                    }
+                                }
+                             }
+                         }
                     }
                 }
             }
@@ -130,10 +221,25 @@
                 elemOpts.setAttribute("class", "shown");
                 el.innerHTML='-';
                 el.setAttribute("title","Collapse Options");
+                moodComplete.wrapper.style.display='block';
+                moodComplete.repaint();
+                
+                
+                styleComplete.wrapper.style.display='block';
+                styleComplete.repaint();
+                document.getElementById("sortSelector").style.display='block';
             }else{
                 elemOpts.setAttribute("class", "");
                 el.innerHTML='+';
                 el.setAttribute("title","Options");
+                
+                moodComplete.wrapper.style.display='none';
+                moodComplete.repaint();
+                
+                styleComplete.wrapper.style.display='none';
+                styleComplete.repaint();
+                
+                document.getElementById("sortSelector").style.display='none';
             }
             shown=!shown;
 
@@ -149,9 +255,7 @@
                 elemPlayButton.innerHTML="&nbsp;&nbsp;&#9654;"
                 elemPlayButton.setAttribute("title","play");
             }
-                
-            console.log("playpaused!!!!");
-         }
+         }/*
          function nextSong(){
             songPlaying++;
             while(data.response.songs[songPlaying].tracks.length==0 &&songPlaying<4)
@@ -177,7 +281,7 @@
                 spotifyID=data.response.songs[songPlaying].tracks[0].foreign_id;
                 playSpotifyTrack(spotifyID.substr(spotifyID.lastIndexOf(':')+1), artist, song);
             }
-         }
+         }*/
             
     </script>
     <title>SongSpace</title>
@@ -189,15 +293,20 @@
         SongSpace
     </span> 
     <span id="hiddenOptions">
+    <span id="sortSelector">
     Select song by
-    <section>
-            <select class="cs-select cs-skin-underline" id="sort">
+            <select class="my-select" id="sort">
                     <option value="song_hotttnesss-desc">Song Popularity</option>
                     <option value="artist_hotttnesss-desc">Artist Popularity</option>
                     <option value="artist_familiarity-desc">Artist Familiarity</option>
                     <option value="">Random</option>
             </select>
-    </section>
+    </span>
+    <span class="hiddenOpt"> Style: <span type='text' id="styleSelector"></span>
+    </span>
+    <span class="hiddenOpt"> Mood: <span type='text' id="moodSelector"></span>
+    </span>
+    
     </span>
     <span id="extender" onclick="showE(this)" title="Options">
     +
@@ -206,11 +315,15 @@
     <script src="js/classie.js"></script>
     <script src="js/selectFx.js"></script>
     <script>
+            //Make selector pretty (TODO: Make selector pretty without js??)
+            //Also: code taken from codrops
             (function() {
                     [].slice.call( document.querySelectorAll( 'select.cs-select' ) ).forEach( function(el) {        
                             new SelectFx(el);
                     } );
             })();
+            
+            
     </script>
 
   </body>
